@@ -7,6 +7,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use('/public', express.static('public'));
+
 const UploadUpdateResize = require('./upload')
 
 let images = {path: null, preview: ""}

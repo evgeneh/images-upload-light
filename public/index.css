@@ -1,0 +1,76 @@
+body {
+    font-family: Verdana, Geneva, sans-serif;
+    margin: 0;
+    background: rgba(0, 0, 0, .4);
+    display: grid;
+    justify-content: center;
+    padding-top: 6rem;
+}
+
+.upload-panel {
+    padding: 2rem;
+    background: #fff;
+    color: #323232;
+    width: 400px;
+    min-height: 300px;
+    max-height: 450px;
+    border-radius: 10px;
+    text-align: center;
+    display:grid;
+    grid-template-rows: 60px auto 65px;
+}
+
+.uploaded p {
+    text-align: justify;
+    line-height: 1.5;
+    text-indent: 20px;
+}
+
+.form-input {
+    grid-area: input;
+}
+.form-label {
+    grid-area: label;
+}
+
+.form-submit {
+    grid-area: btn;
+    text-decoration: none;
+    border: 1px solid #323232;
+    border-radius: 3px;
+    background-color: white;
+    padding: 3px 5px 5px 5px;
+    margin: 5px 55px;
+    font-weight: bold;
+    color: rgb(0, 100, 255);
+    font-size: 14px;
+}
+.form-submit:hover {
+    background: rgb(0, 90, 255);
+    border: 1px solid rgb(0, 100, 255);
+    color: white;
+}
+
+form {
+    text-align: left;
+    display: grid;
+    grid-template-areas: "label input"
+                            "btn btn";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 30px 35px;
+}
+
+.links {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-gap: 3px;
+    font-size: 9px;
+    padding: 5px 0;
+}
+.links label{
+    padding-top: 4px;
+}
+.links input{
+    font-size: 11px;
+    color: gray;
+}

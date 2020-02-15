@@ -106,11 +106,11 @@ const UploadUpdateResize =  async (req, res, cb) => {
 
             let date = Date.now();
             let tempAddress = "upload/temp_small.jpg"
-            const PROJECT_DIR = getFileSystemDir()
+            const PROJECT_DIR = getFileSystemDir();
 
             await resizeJimp( 'upload/' + req.file.filename, tempAddress, 140, 140)
 
-            const [resOrigin, resSmall]  = await gitPromise.all(
+            const [resOrigin, resSmall]  = await Promise.all(
                 [uploadFiles('upload/' + req.file.filename, PROJECT_DIR + originalToPath(req.file.originalname, date)),
                         uploadFiles(tempAddress, PROJECT_DIR + originalToPath(req.file.originalname, date, true)) ]
             )

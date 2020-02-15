@@ -1,20 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="public/index.css" >
     <meta charset="utf-8"/>
     <title>upload file</title>
 
 </head>
 <body>
-    <div id="root">
+    <div id="root" class="upload-panel">
         <h1>Upload file</h1>
-        <%if (images.path) { %>
-        <span> your upload</span><a href=<%=images.path %>> <img src=<%=images.preview %> /> </a>
-        <% } %>
+        <div class="uploaded">
+
+            <% if (images.path) { %>
+                <a href=<%=images.path %>> <img src=<%=images.preview %> /> </a>
+            <div class="links">
+                <label >Full image: </label>
+                <input type="text" value=<%=images.path %> >
+                <label >Thumbnail: </label>
+                <input type="text" value=<%=images.preview %> >
+            </div>
+            <% } else {%>
+                <p>   Hello this is simple image uploading service, you can choose your file and send it to server.
+                    You will receive file two links: link to uploaded file and link to small copy (140x140 pixels).
+                Enjoy!</p>
+            <% } %>
+        </div>
         <form method="post" enctype="multipart/form-data" action="/upload">
-            <label for="file">please select a file</label>
-            <input type="file" name="upload"><br/>
-            <input type="submit" class="button">
+            <div class="form-label">
+                <label for="file">Select a file:&nbsp;</label>
+            </div>
+            <div class="form-input">
+                <input type="file" name="upload"><br/>
+            </div>
+            <input type="submit" value="Start uploading" class="form-submit">
         </form>
     </div>
 
