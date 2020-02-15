@@ -3,33 +3,31 @@ const multer = require('multer');
 
 const path = require('path')
 const fs = require('fs');
+const Jimp = require('jimp');
 
 const hashCode = require('./utils/hash');
 
 const config = require('./config');
 
-aws.config.update({
-    accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
-    secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY
-});
 
+//-------------set space parameters ------------------
+aws.config.update({
+    accessKeyId: config.SPACES_ACCESS_KEY_ID,
+    secretAccessKey: config.SPACES_SECRET_ACCESS_KEY
+});
 
 const spacesEndpoint = new aws.Endpoint(config.UPLOAD_ENDPOINT);
 const s3 = new aws.S3({
     endpoint: spacesEndpoint
 });
 
-
+//convert file name to new with current date, original file name and add "_small" if thumbnail
 const originalToPath = (originalName, dateNow, isSmall=false) => {
     const smallMeta = isSmall ? "_small" : "";
     const result =  dateNow.toString(36) + hashCode(originalName) + smallMeta + path.extname(originalName)
     console.log(result)
     return result
 }
-
-const Jimp = require('jimp');
-
-///////2  variant with buffer
 
 
 const storage = multer.diskStorage({
@@ -59,8 +57,6 @@ function uploadFiles(localPath, uploadFileName) {
 
     return new Promise((resolve, reject) => {
 
-        console.log(localPath + "   " + uploadFileName)
-
         fs.readFile(localPath, function (err, file) {
             if (err) {
                 console.log("cannot read local " + err)
@@ -86,35 +82,42 @@ function uploadFiles(localPath, uploadFileName) {
 
     });
 }
+const getFileSystemDir = () => {
+    const rs = () => Math.random().toString(36).slice(-3);
+    const dir = config.UPLOAD_ROOT_DIR + "/" + rs() + "/" + rs() + "/";
+    return dir;
+}
 
-
-async function resizeJimp(buffer , tempAddr,  width, height) {
+const resizeJimp = async (buffer , tempAddr,  width, height) => {
      const image  = await Jimp.read(buffer)
          await image
              .autocrop()
-             .resize(100, 100) // resize
+             .resize(width, height) // resize
              .quality(70) // set JPEG quality
              .write(tempAddr); // save
-
 }
 
-const UploadUpdateResize =  (req, res, cb) => {
-    upload(req, res,  (err) => {
+const UploadUpdateResize =  async (req, res, cb) => {
+    upload(req, res,  async (err) => {
         if (err) {
             return cb(err.code)
-        } else {
+        }
+        else try {
 
             let date = Date.now();
             let tempAddress = "upload/temp_small.jpg"
+            const PROJECT_DIR = getFileSystemDir()
 
-            resizeJimp( 'upload/' + req.file.filename, tempAddress).then( () => {
+            await resizeJimp( 'upload/' + req.file.filename, tempAddress, 140, 140)
 
-                Promise.all([uploadFiles('upload/' + req.file.filename, originalToPath(req.file.originalname, date)),
-                    uploadFiles(tempAddress, originalToPath(req.file.originalname, date, true))
-                ])
-
-                return cb(null)
-            })
+            const [resOrigin, resSmall]  = await gitPromise.all(
+                [uploadFiles('upload/' + req.file.filename, PROJECT_DIR + originalToPath(req.file.originalname, date)),
+                        uploadFiles(tempAddress, PROJECT_DIR + originalToPath(req.file.originalname, date, true)) ]
+            )
+            return cb(null, resOrigin.Location, resSmall.Location)
+        }
+        catch (error) {
+            return cb(error)
         }
     })
 }
